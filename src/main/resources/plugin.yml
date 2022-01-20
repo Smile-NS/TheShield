@@ -1,0 +1,4 @@
+name: TheShield
+version: ${project.version}
+main: io.github.smile_ns.theshield.TheShield
+api-version: 1.16
