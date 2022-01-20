@@ -1,2 +1,2 @@
 # TheShield
-剣に{Unbreakable:1b}つけてね
+盾に{Unbreakable:1b}つけてね
