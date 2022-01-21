@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -19,13 +20,13 @@ import static org.bukkit.event.block.Action.*;
 
 public final class TheShield extends JavaPlugin implements Listener {
 
-    private static final int TIME = 5;
-    private static final int PERIOD = 10;
+    static final int TIME = 5;
+    static final int PERIOD = 10;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-        Bukkit.getServer().getPluginManager().registerEvents(this,this);
+        Bukkit.getServer().getPluginManager().registerEvents(this, this);
 
     }
 
@@ -35,9 +36,9 @@ public final class TheShield extends JavaPlugin implements Listener {
     }
 
     @EventHandler
-    public void onUseShield(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        Action action = event.getAction();
+    public void onUseShield(PlayerInteractEvent e) {
+        Player player = e.getPlayer();
+        Action action = e.getAction();
         if (action == LEFT_CLICK_AIR ||
                 action == LEFT_CLICK_BLOCK ||
                 action == PHYSICAL
@@ -89,5 +90,10 @@ public final class TheShield extends JavaPlugin implements Listener {
                 first[0] = false;
             }
         }.runTaskTimer(this, 0, PERIOD);
+    }
+
+    @EventHandler
+    public void onBlock(BlockDamageEvent e) {
+        if (e.getInstaBreak()) e.setInstaBreak(false);
     }
 }
