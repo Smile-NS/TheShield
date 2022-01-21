@@ -6,13 +6,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -55,7 +54,6 @@ public final class TheShield extends JavaPlugin implements Listener {
         assert meta != null;
         int maxDurability = shield.getType().getMaxDurability();
         final boolean[] first = {true};
-        Plugin pl = this;
 
         new BukkitRunnable() {
             public void run() {
@@ -73,15 +71,7 @@ public final class TheShield extends JavaPlugin implements Listener {
                     else inv.remove(shield);
                     cancel();
 
-                    int slot = inv.getHeldItemSlot();
-                    new BukkitRunnable() {
-                        public void run() {
-                            ItemStack newShield = new ItemStack(Material.SHIELD);
-                            if (inv.getItem(slot) != null) inv.addItem(newShield);
-                            else inv.setItem(slot, newShield);
-                            cancel();
-                        }
-                    }.runTaskTimer(pl, 100, 0);
+                    itemBack(player);
                     return;
                 }
 
@@ -92,8 +82,25 @@ public final class TheShield extends JavaPlugin implements Listener {
         }.runTaskTimer(this, 0, PERIOD);
     }
 
+    void itemBack(Player player) {
+        PlayerInventory inv = player.getInventory();
+        int slot = inv.getHeldItemSlot();
+
+        new BukkitRunnable() {
+            public void run() {
+                ItemStack newShield = new ItemStack(Material.SHIELD);
+                if (inv.getItem(slot) != null) inv.addItem(newShield);
+                else inv.setItem(slot, newShield);
+                cancel();
+            }
+        }.runTaskTimer(this, 100, 0);
+    }
+
     @EventHandler
-    public void onBlock(BlockDamageEvent e) {
-        if (e.getInstaBreak()) e.setInstaBreak(false);
+    public void onItemBreak(PlayerItemBreakEvent e) {
+        ItemStack item = e.getBrokenItem();
+        if (item.getType() != Material.SHIELD) return;
+
+        itemBack(e.getPlayer());
     }
 }
